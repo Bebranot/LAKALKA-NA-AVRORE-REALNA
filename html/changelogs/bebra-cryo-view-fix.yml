@@ -1,0 +1,4 @@
+author: bebra
+delete-after: True
+changes:
+  - bugfix: "Fixed a bug where being auto-despawned from cryo (or having a disposal holder destroyed mid-transit) could leave your view stuck on the deleted object, showing an empty screen with no walls even after regaining control of a mob."

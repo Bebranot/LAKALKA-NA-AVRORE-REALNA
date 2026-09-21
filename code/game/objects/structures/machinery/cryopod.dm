@@ -351,6 +351,18 @@
 // This function can not be undone; do not call this unless you are sure
 // Also make sure there is a valid control computer
 /obj/structure/machinery/cryopod/proc/despawn_occupant()
+	// go_out() (the manual "Eject" path) restores the occupant's client eye/perspective before
+	// letting them go, but this automatic path (fired by process() on a timeout, which can still
+	// have a connected client - see time_till_force_cryo) never did. DespawnMob() below nulls the
+	// mob's ckey and deletes it without touching the client, so any eye/perspective left pointing
+	// at this pod (set in set_occupant()) - or at whatever other machine/pipe last hijacked it and
+	// was never reset either - stayed stuck on the now-orphaned client, leaving the player staring
+	// at a hidden object with an empty view (no walls, no vignette, "stuck like in a pipe") even
+	// after ending up in a brand new mob.
+	if(occupant.client)
+		occupant.client.eye = occupant.client.mob
+		occupant.client.perspective = MOB_PERSPECTIVE
+
 	var/list/items = occupant.get_contents()
 	var/turf/T = get_turf(src)
 	//Drop all items into the pod.

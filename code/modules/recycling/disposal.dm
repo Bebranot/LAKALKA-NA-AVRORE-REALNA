@@ -850,6 +850,16 @@
 	STOP_PROCESSING(SSdisposals, src)
 	QDEL_NULL(gas)
 	tick_last = null
+	// Every normal exit path (expel() at an outlet/machine) does forceMove() + pipe_eject() on
+	// its contents before qdel'ing the holder, and pipe_eject() is what actually restores a mob's
+	// client eye/perspective from the pipe-transit view. If the holder is ever destroyed by some
+	// other path (pipe destruction mid-transit, forced cleanup, etc.) without going through an
+	// expel(), a mob still inside would keep its view stuck on this (now-deleted) holder instead
+	// of being restored to its own eyes.
+	if(loc)
+		for(var/atom/movable/AM in src)
+			AM.forceMove(loc)
+			AM.pipe_eject(0)
 	return ..()
 
 // Disposal pipes
