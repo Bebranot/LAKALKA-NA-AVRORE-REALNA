@@ -40,6 +40,105 @@ var split_admin_tabs = false;
 //The 'default' tab that everyone should have, that we swap to if the tab you're on is deleted or anything similar.
 var defaultTab = 'Status';
 
+// Tab search ------------------------------------------------------------
+// Lets you type a verb name (or a tab name) and hides every tab button that
+// doesn't have a match, in either English or Russian. Verb names/categories
+// are hardcoded English (e.g. the "Aghost" verb lives under the "Admin"
+// category), so a Russian query is expanded through this synonym table
+// before being matched.
+var tabSearchQuery = '';
+var TAB_SEARCH_SYNONYMS = [
+  ['aghost', 'admin ghost', 'агост', 'админ-гост', 'админ призрак'],
+  ['admin', 'админ', 'админка'],
+  ['ooc', 'оос', 'внеигровой'],
+  ['ic', 'ик', 'персонаж'],
+  ['mc', 'мк'],
+  ['debug', 'дебаг', 'отладка'],
+  ['ticket', 'tickets', 'тикет', 'тикеты', 'жалоба', 'жалобы'],
+  ['object', 'объект', 'объекты'],
+  ['preferences', 'настройки', 'предпочтения'],
+  ['server', 'сервер'],
+  ['fun', 'фан', 'веселье'],
+  ['status', 'статус'],
+  ['game', 'игра'],
+  ['events', 'ивент', 'ивенты', 'событие', 'события'],
+];
+
+function normalizeSearchText(text) {
+  return String(text).trim().toLowerCase();
+}
+
+// Given a normalized query, returns every term that should count as a match,
+// including the query itself and any synonym group it partially matches.
+function expandSearchTerms(query) {
+  var terms = [query];
+  for (var i = 0; i < TAB_SEARCH_SYNONYMS.length; i++) {
+    var group = TAB_SEARCH_SYNONYMS[i];
+    var inGroup = false;
+    for (var j = 0; j < group.length; j++) {
+      if (group[j] === query || group[j].indexOf(query) === 0) {
+        inGroup = true;
+        break;
+      }
+    }
+    if (inGroup) {
+      terms = terms.concat(group);
+    }
+  }
+  return terms;
+}
+
+function textMatchesTerms(text, terms) {
+  var normalized = normalizeSearchText(text);
+  for (var i = 0; i < terms.length; i++) {
+    if (normalized.indexOf(terms[i]) !== -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Mirrors the category-splitting logic used by createStatusTab/draw_verbs,
+// so we compare against the same tab id those functions actually create.
+function tabCategoryBase(name) {
+  if (name.indexOf('.') != -1) {
+    var splitName = name.split('.');
+    if (split_admin_tabs && splitName[0] === 'Admin') return splitName[1];
+    return splitName[0];
+  }
+  return name;
+}
+
+// Shows/hides existing tab buttons in #menu based on tabSearchQuery, matching
+// either the tab name itself or any verb name filed under that tab.
+function applyTabSearch() {
+  var query = normalizeSearchText(tabSearchQuery);
+  var buttons = menu.children;
+  if (!query) {
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].style.display = '';
+    }
+    return;
+  }
+  var terms = expandSearchTerms(query);
+  for (var i = 0; i < buttons.length; i++) {
+    var button = buttons[i];
+    var tabId = button.id;
+    var matched = textMatchesTerms(tabId, terms);
+    if (!matched) {
+      for (var v = 0; v < verbs.length; v++) {
+        var part = verbs[v];
+        if (tabCategoryBase(part[0]) !== tabId) continue;
+        if (textMatchesTerms(part[1], terms)) {
+          matched = true;
+          break;
+        }
+      }
+    }
+    button.style.display = matched ? '' : 'none';
+  }
+}
+
 // Any BYOND commands that could result in the client's focus changing go through this
 // to ensure that when we relinquish our focus, we don't do it after the result of
 // a command has already taken focus for itself.
@@ -73,6 +172,7 @@ function createStatusTab(name) {
   //END ORDERING
   menu.appendChild(button);
   SendTabToByond(name);
+  if (tabSearchQuery) applyTabSearch();
 }
 
 function removeStatusTab(name) {
@@ -651,6 +751,8 @@ function draw_verbs(cat) {
     if (splitName[0] === 'Admin') cat = splitName[1];
   }
   verbs.reverse(); // sort verbs backwards before we draw
+  var searchQuery = normalizeSearchText(tabSearchQuery);
+  var searchTerms = searchQuery ? expandSearchTerms(searchQuery) : null;
   for (var i = 0; i < verbs.length; ++i) {
     var part = verbs[i];
     var name = part[0];
@@ -665,6 +767,11 @@ function draw_verbs(cat) {
       name.lastIndexOf(cat, 0) != -1 &&
       (name.length == cat.length || name.charAt(cat.length) == '.')
     ) {
+      // Same search that filters which tabs show up also hides the
+      // non-matching verb buttons inside the tab that's currently open.
+      if (searchTerms && !textMatchesTerms(command, searchTerms)) {
+        continue;
+      }
       var subCat = name.lastIndexOf('.') != -1 ? name.split('.')[1] : null;
       if (subCat && !additions[subCat]) {
         var newTable = document.createElement('div');
@@ -772,10 +879,34 @@ function add_verb_list(payload) {
       createStatusTab(category);
     }
   }
+  if (tabSearchQuery) applyTabSearch();
 }
 
 document.addEventListener('mouseup', restoreFocus);
 document.addEventListener('keyup', restoreFocus);
+
+// The global keyup/mouseup listeners above yank keyboard focus back to the
+// game map after every keystroke anywhere on the page (so verb buttons don't
+// eat focus). Without stopping propagation here, that would make it
+// impossible to type more than one character into the search box.
+var tabSearchInput = document.getElementById('tab-search-input');
+if (tabSearchInput) {
+  tabSearchInput.addEventListener('keyup', function (e) {
+    e.stopPropagation();
+  });
+  tabSearchInput.addEventListener('mouseup', function (e) {
+    e.stopPropagation();
+  });
+  tabSearchInput.addEventListener('input', function (e) {
+    tabSearchQuery = e.target.value;
+    applyTabSearch();
+    // Also refilter the verb buttons of whatever tab is currently open,
+    // instead of only updating them the next time it's switched to.
+    if (verb_tabs.includes(current_tab)) {
+      draw_verbs(current_tab);
+    }
+  });
+}
 
 if (!current_tab) {
   addPermanentTab(defaultTab);

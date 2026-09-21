@@ -1,0 +1,4 @@
+author: bebra
+delete-after: True
+changes:
+  - qol: "Added a search box to the classic stat panel (top-right tab bar): typing a verb or tab name (in English or Russian, e.g. aghost/агост) hides non-matching tabs and non-matching buttons inside the open tab."

@@ -65,12 +65,43 @@ img {
   height: 100vh;
 }
 
+.menu-row {
+  display: flex;
+  align-items: center;
+}
+
 #menu {
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.25em 0.25em 0;
   background-color: #ffffff;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tab-search {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  flex: 0 0 auto;
+  padding: 0.25em 0.4em 0;
+  background-color: #ffffff;
+}
+
+.tab-search-icon {
+  opacity: 0.5;
+  font-size: 0.9em;
+}
+
+.tab-search input {
+  width: 7em;
+  font-size: 1em;
+  padding: 0.2em 0.4em;
+  border: 1px solid #cccccc;
+  border-radius: 0.25em;
+  background-color: #ffffff;
+  color: inherit;
 }
 
 .menu-wrap {
@@ -257,6 +288,16 @@ body.dark {
 
 .dark #menu {
   background-color: #151515;
+}
+
+.dark .tab-search {
+  background-color: #151515;
+}
+
+.dark .tab-search input {
+  background-color: #202020;
+  border-color: #363636;
+  color: #b2c4dd;
 }
 
 .dark #menu.tabs-classic .button.active {
