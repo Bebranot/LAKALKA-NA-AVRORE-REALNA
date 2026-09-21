@@ -39,6 +39,8 @@
 	var/atom/movable/screen/toxin = null
 	var/atom/movable/screen/bodytemp = null
 	var/atom/movable/screen/healths = null
+	/// Cheap signature of everything that feeds the healths overlay, so we can skip rebuilding+resending it when nothing actually changed since the last tick.
+	var/health_hud_signature
 	var/atom/movable/screen/throw_icon = null
 	var/atom/movable/screen/nutrition_icon = null
 	var/atom/movable/screen/hydration_icon = null

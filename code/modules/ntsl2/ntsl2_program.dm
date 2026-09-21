@@ -10,6 +10,15 @@ Datum representing program state on deamon and exposing apropriate procs to DM.
 /datum/ntsl2_program/New()
 	..()
 
+/datum/ntsl2_program/Destroy()
+	// new_program_computer()/new_program_tcomm() START_PROCESSING(SSntsl2, src) us, but nothing
+	// ever called STOP_PROCESSING - since this is a plain /datum (not /obj), there's no base
+	// Destroy() that does it for us, so every killed program used to sit in SSntsl2.processing
+	// forever, still getting process() called on it, forever pinning it out of GC.
+	if(datum_flags & DF_ISPROCESSING)
+		STOP_PROCESSING(SSntsl2, src)
+	return ..()
+
 /datum/ntsl2_program/proc/is_ready()
 	return !!id
 

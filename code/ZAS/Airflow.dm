@@ -137,16 +137,22 @@ Contains helper procs for airflow, handled in /connection_group.
 
 	var/static/list/movables_tcache = typecacheof(list(/obj/effect, /mob/abstract))
 
+	// Scanning every turf in the zone (which can be the whole station) and checking its
+	// distance to each origin does not scale. Origins are almost always a small edge, so
+	// instead scan a bounded square around each origin and skip turfs outside this zone.
+	// This is equivalent to the old get_dist() <= EDGE_KNOCKDOWN_MAX_DISTANCE check, since
+	// range() on an orthogonal map already selects turfs within that Chebyshev distance.
+	var/list/visited_turfs = list()
 	var/atom/movable/AM
-	for (var/testing_turf in contents)
+	for (var/source_turf in origins)
 		CHECK_TICK
-		for (var/am in testing_turf)
-			AM = am
+		for (var/turf/simulated/testing_turf in range(EDGE_KNOCKDOWN_MAX_DISTANCE, source_turf))
+			if (testing_turf.zone != src || visited_turfs[testing_turf])
+				continue
+			visited_turfs[testing_turf] = TRUE
 			CHECK_TICK
-			if (AM.simulated && !AM.anchored && !movables_tcache[AM.type])
-				for (var/source_turf in origins)
-					if (get_dist(testing_turf, source_turf) <= EDGE_KNOCKDOWN_MAX_DISTANCE)
-						.[AM] = TRUE
-						break
-
-					CHECK_TICK
+			for (var/am in testing_turf)
+				AM = am
+				CHECK_TICK
+				if (AM.simulated && !AM.anchored && !movables_tcache[AM.type])
+					.[AM] = TRUE

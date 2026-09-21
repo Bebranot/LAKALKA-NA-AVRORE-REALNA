@@ -109,6 +109,7 @@ Class Procs:
 		#ifdef ZASDBG
 		T.dbg(GLOB.merged)
 		#endif
+		CHECK_TICK
 
 	//rebuild the old zone's edges so that they will be possessed by the new zone
 	for(var/ee in edges)
@@ -160,6 +161,7 @@ Class Procs:
 	if(air.check_tile_graphic(graphic_add, graphic_remove))
 		for(var/turf/simulated/T in contents)
 			T.update_graphic(graphic_add, graphic_remove)
+			CHECK_TICK
 		graphic_add.Cut()
 		graphic_remove.Cut()
 

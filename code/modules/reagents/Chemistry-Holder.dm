@@ -90,19 +90,28 @@
 		return FALSE
 
 	var/reaction_occured
+	// Tracks whether anything was can_happen()-eligible on the LAST pass below, so we don't have
+	// to redo the exact same reagent_volumes scan + can_happen() checks a second time via
+	// has_reactions() right after - nothing changes reagent_volumes between that last pass and
+	// the old has_reactions() call, so recomputing it was pure duplicate work every tick for
+	// every active reagent holder in the game.
+	var/any_reaction_eligible
 	var/list/effect_reactions = list()
 	var/list/eligible_reactions = list()
 	for(var/i in 1 to PROCESS_REACTION_ITER)
 		reaction_occured = FALSE
+		any_reaction_eligible = FALSE
 
 		//need to rebuild this to account for chain reactions
 		for(var/thing in reagent_volumes)
 			eligible_reactions |= SSchemistry.chemical_reactions[thing]
 
 		for(var/datum/chemical_reaction/C in eligible_reactions)
-			if(C.can_happen(src) && C.process(src))
-				effect_reactions |= C
-				reaction_occured = TRUE
+			if(C.can_happen(src))
+				any_reaction_eligible = TRUE
+				if(C.process(src))
+					effect_reactions |= C
+					reaction_occured = TRUE
 		eligible_reactions.Cut()
 		if(!reaction_occured)
 			break
@@ -111,7 +120,7 @@
 		C.post_reaction(src)
 
 	update_holder(reactions = reaction_occured)
-	return has_reactions()
+	return any_reaction_eligible
 
 /* Holder-to-chemical */
 

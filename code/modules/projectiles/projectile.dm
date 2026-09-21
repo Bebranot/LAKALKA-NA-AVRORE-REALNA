@@ -384,11 +384,14 @@
 	if(!ishuman(A) || !starting)
 		return FALSE
 	var/mob/living/carbon/human/M = A
-	var/list/left_hand_defense_zones = list(BP_L_ARM, BP_L_HAND, BP_CHEST, BP_GROIN)
-	var/list/right_hand_defense_zones = list(BP_R_ARM, BP_R_HAND, BP_CHEST, BP_GROIN)
+	// These zone sets never change - build them once at compile time instead of allocating two
+	// fresh lists on every single bullet/laser hit against a human.
+	var/static/list/left_hand_defense_zones = list(BP_L_ARM, BP_L_HAND, BP_CHEST, BP_GROIN)
+	var/static/list/right_hand_defense_zones = list(BP_R_ARM, BP_R_HAND, BP_CHEST, BP_GROIN)
 	if(point_blank || !(M.dir & get_dir(M, starting))) //Don't use the shield if the shot is at point blank, or the shot comes from behind or the sides.
 		return FALSE
-	for(var/obj/item/grab/G in list(M.l_hand, M.r_hand))
+	for(var/hand_index in 1 to 2)
+		var/obj/item/grab/G = (hand_index == 1) ? M.l_hand : M.r_hand
 		if(!G?.affecting || G.state < GRAB_NECK || G.affecting.lying)
 			continue
 		if(G.affecting.mob_size < M.mob_size) //Humans are size 9, Unathi and Varuca workers 10, G1 & G2 are 11. This is mostly to make monkeys bad human shields.

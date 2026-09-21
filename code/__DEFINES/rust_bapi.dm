@@ -29,7 +29,7 @@
 			return __bapi = "./rust/bapi/target/i686-pc-windows-msvc/debug/bapi.dll"
 		// Then check in the current directory.
 		if(fexists("./bapi.dll"))
-			return __bapi = "./bapi.dll"
+			return __bapi = "C:\\LAKALKA-NA-AVRORE-REALNA\\bapi.dll"
 		// And elsewhere.
 		return __bapi = "bapi.dll"
 

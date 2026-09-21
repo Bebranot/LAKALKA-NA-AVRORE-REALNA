@@ -11,9 +11,15 @@
 	. = PB
 	if(light_range > 0 && light_intensity > 0)
 		var/list/turf/line = get_line(starting.return_turf(), ending.return_turf())
+		// A separate light source per tile of the beam is overkill for a purely cosmetic,
+		// sub-second effect - the light's own range already covers the gap, so light every
+		// other tile (always including the last one) instead of spawning one per tile. Halves
+		// the light-source count on long shots with no visible difference in the glow.
 		tracing_line:
-			for(var/i in line)
-				var/turf/T = i
+			for(var/i in 1 to length(line))
+				if(i != length(line) && (i % 2 == 0))
+					continue
+				var/turf/T = line[i]
 				for(var/obj/effect/projectile_lighting/PL in T)
 					if(PL.owner == instance_key)
 						continue tracing_line

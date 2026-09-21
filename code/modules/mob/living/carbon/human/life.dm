@@ -997,68 +997,82 @@
 				paralysis_indicator.icon_state = "paralysis0"
 
 		if(healths)
-			healths.overlays.Cut()
-			if (chem_effects[CE_PAINKILLER] > 100)
-				healths.icon_state = "health_numb"
-			else
-				// Generate a by-limb health display.
-				healths.icon_state = "blank"
+			var/numb = (chem_effects[CE_PAINKILLER] > 100)
+			var/no_damage = 1
+			var/trauma_val = 0 // Used in calculating softcrit/hardcrit indicators.
+			if(!numb && can_feel_pain())
+				trauma_val = max(shock_stage,get_shock())/(species.total_health-100)
 
-				var/no_damage = 1
-				var/trauma_val = 0 // Used in calculating softcrit/hardcrit indicators.
-				if(can_feel_pain())
-					trauma_val = max(shock_stage,get_shock())/(species.total_health-100)
-				// Collect and apply the images all at once to avoid appearance churn.
-				var/list/health_images = list()
+			// Cheap signature of everything the block below actually renders. Rebuilding and
+			// reassigning healths.overlays forces BYOND to recompute this atom's appearance and
+			// push it to the owning client - doing that every 2-second Life() tick regardless of
+			// whether anything changed was pure wasted CPU and bandwidth for every living human.
+			var/sig = "[numb]|[on_fire]|[on_fire ? fire_stacks : 0]|[is_asystole()]|[trauma_val]"
+			if(!numb)
 				for(var/obj/item/organ/external/E in organs)
 					if(no_damage && (LIMB_GET_BRUTE_DAMAGE(E) || LIMB_GET_BURN_DAMAGE(E)))
 						no_damage = 0
-					health_images += E.get_damage_hud_image()
+					sig += "|[E.damage_state]:[E.icon_name]:[E.bandage_level]:[E.is_stump()]"
+				sig += "|[no_damage]|[get_blood_color()]|[species.get_bodytype()]"
 
-				// Add wound overlays
-				for(var/obj/item/organ/external/O in organs)
-					if(O.damage_state == "00") continue
-					var/cache_index = "[O.damage_state]/[O.icon_name]/[get_blood_color()]/[species.get_bodytype()]"
-					var/list/damage_icon_parts = SSicon_cache.damage_icon_parts
-					var/icon/DI = damage_icon_parts[cache_index]
-					if(!DI)
-						DI = new /icon(species.damage_overlays, O.damage_state)			// the damage icon for whole human
-						DI.Blend(new /icon(species.damage_mask, O.icon_name), ICON_MULTIPLY)	// mask with this organ's pixels
-						DI.Blend(get_blood_color(), ICON_MULTIPLY)
-						damage_icon_parts[cache_index] = DI
-					health_images += DI
-					if(O.is_stump())
-						continue
-					var/bandage_icon = species.bandages_icon
-					if(!bandage_icon)
-						continue
-					var/bandage_level = O.bandage_level
-					if(bandage_level)
-						health_images += image(bandage_icon, "[O.icon_name][bandage_level]")
+			if(sig != health_hud_signature)
+				health_hud_signature = sig
+				healths.overlays.Cut()
+				if(numb)
+					healths.icon_state = "health_numb"
+				else
+					// Generate a by-limb health display.
+					healths.icon_state = "blank"
 
-				// Apply a fire overlay if we're burning.
-				if(on_fire)
-					var/image/burning_image = image('icons/hud/mob/screen1_health.dmi', "burning", pixel_x = species.healths_overlay_x)
-					var/midway_point = FIRE_MAX_STACKS / 2
-					burning_image.color = color_rotation((midway_point - fire_stacks) * 3)
+					// Collect and apply the images all at once to avoid appearance churn.
+					var/list/health_images = list()
+					for(var/obj/item/organ/external/E in organs)
+						health_images += E.get_damage_hud_image()
 
-				// Show a general pain/crit indicator if needed.
-				if(is_asystole())
-					var/image/hardcrit_image = image('icons/hud/mob/screen1_health.dmi', "hardcrit", pixel_x = species.healths_overlay_x)
-					health_images += hardcrit_image
-				else if(trauma_val)
-					if(can_feel_pain())
-						if(trauma_val > 0.7)
-							var/image/softcrit_image = image('icons/hud/mob/screen1_health.dmi', "softcrit", pixel_x = species.healths_overlay_x)
-							health_images += softcrit_image
-						if(trauma_val >= 1)
-							var/image/hardcrit_image = image('icons/hud/mob/screen1_health.dmi', "hardcrit", pixel_x = species.healths_overlay_x)
-							health_images += hardcrit_image
-				else if(no_damage)
-					var/image/fullhealth_image = image('icons/hud/mob/screen1_health.dmi', "fullhealth", pixel_x = species.healths_overlay_x)
-					health_images += fullhealth_image
+					// Add wound overlays
+					for(var/obj/item/organ/external/O in organs)
+						if(O.damage_state == "00") continue
+						var/cache_index = "[O.damage_state]/[O.icon_name]/[get_blood_color()]/[species.get_bodytype()]"
+						var/list/damage_icon_parts = SSicon_cache.damage_icon_parts
+						var/icon/DI = damage_icon_parts[cache_index]
+						if(!DI)
+							DI = new /icon(species.damage_overlays, O.damage_state)			// the damage icon for whole human
+							DI.Blend(new /icon(species.damage_mask, O.icon_name), ICON_MULTIPLY)	// mask with this organ's pixels
+							DI.Blend(get_blood_color(), ICON_MULTIPLY)
+							damage_icon_parts[cache_index] = DI
+						health_images += DI
+						if(O.is_stump())
+							continue
+						var/bandage_icon = species.bandages_icon
+						if(!bandage_icon)
+							continue
+						var/bandage_level = O.bandage_level
+						if(bandage_level)
+							health_images += image(bandage_icon, "[O.icon_name][bandage_level]")
 
-				healths.overlays += health_images
+					// Apply a fire overlay if we're burning.
+					if(on_fire)
+						var/image/burning_image = image('icons/hud/mob/screen1_health.dmi', "burning", pixel_x = species.healths_overlay_x)
+						var/midway_point = FIRE_MAX_STACKS / 2
+						burning_image.color = color_rotation((midway_point - fire_stacks) * 3)
+
+					// Show a general pain/crit indicator if needed.
+					if(is_asystole())
+						var/image/hardcrit_image = image('icons/hud/mob/screen1_health.dmi', "hardcrit", pixel_x = species.healths_overlay_x)
+						health_images += hardcrit_image
+					else if(trauma_val)
+						if(can_feel_pain())
+							if(trauma_val > 0.7)
+								var/image/softcrit_image = image('icons/hud/mob/screen1_health.dmi', "softcrit", pixel_x = species.healths_overlay_x)
+								health_images += softcrit_image
+							if(trauma_val >= 1)
+								var/image/hardcrit_image = image('icons/hud/mob/screen1_health.dmi', "hardcrit", pixel_x = species.healths_overlay_x)
+								health_images += hardcrit_image
+					else if(no_damage)
+						var/image/fullhealth_image = image('icons/hud/mob/screen1_health.dmi', "fullhealth", pixel_x = species.healths_overlay_x)
+						health_images += fullhealth_image
+
+					healths.overlays += health_images
 
 		//Update hunger and thirst UI less often, its not important
 		if((life_tick % 3 == 0))

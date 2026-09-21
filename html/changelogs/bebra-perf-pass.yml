@@ -1,0 +1,5 @@
+author: bebra
+delete-after: True
+changes:
+  - code_imp: "Performance pass across the Master Controller, ZAS, mob life/speech, projectiles, reagents and gas mixture code; removed dead/commented-out debug code from admin verbs and docking controllers."
+  - qol: "Time tracking now reacts to lag spikes within ~2 seconds instead of up to 10, keeping movement interpolation in sync with actual server tick rate."

@@ -316,19 +316,19 @@
 		if(total_moles == 0 && sample.total_moles != 0 || sample.total_moles == 0 && total_moles != 0)
 			return 0
 
-	var/list/marked = list()
+	// Every id visited by this loop is a key of `gas`, so "already checked" is just "is a key
+	// of gas" - no need to allocate a separate tracking list for every single comparison call.
 	for(var/g in gas)
 		if((abs(gas[g] - sample.gas[g]) > MINIMUM_AIR_TO_SUSPEND) && \
 		((gas[g] < (1 - MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g]) || \
 		(gas[g] > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g])))
 			return 0
-		marked[g] = 1
 
 	if(abs(XGM_PRESSURE(src) - XGM_PRESSURE(sample)) > MINIMUM_PRESSURE_DIFFERENCE_TO_SUSPEND)
 		return 0
 
 	for(var/g in sample.gas)
-		if(!marked[g])
+		if(!(g in gas))
 			if((abs(gas[g] - sample.gas[g]) > MINIMUM_AIR_TO_SUSPEND) && \
 			((gas[g] < (1 - MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g]) || \
 			(gas[g] > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g])))

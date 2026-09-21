@@ -155,7 +155,10 @@
 
 	//Atoms on your person
 	// A is your location but is not a turf; or is on you (backpack); or is on something on you (box in backpack); sdepth is needed here because contents depth does not equate inventory storage depth.
-	var/sdepth = A.storage_depth(src)
+	// storage_depth() walks A's loc chain doing an "in contents" scan at each step - for a turf
+	// (the overwhelmingly common click target, e.g. any ranged click) it always resolves to -1
+	// after one step anyway, so skip the walk entirely for turfs instead of paying for it first.
+	var/sdepth = isturf(A) ? -1 : A.storage_depth(src)
 	if((!isturf(A) && A == loc) || (sdepth != -1 && sdepth <= 1))
 		if(W)
 			var/resolved = W.resolve_attackby(A, src, params)

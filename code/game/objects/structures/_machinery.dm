@@ -412,24 +412,7 @@ Class Procs:
 	return S
 
 /obj/structure/machinery/proc/RefreshParts()
-	/*
-	if(parts_power_mgmt)
-		var/new_idle_power
-		var/new_active_power
-
-		if(!component_parts || !component_parts.len)
-			return
-		var/parts_energy_rating = 0
-
-		for(var/obj/item/stock_parts/part in component_parts)
-			parts_energy_rating += part.energy_rating()
-
-		new_idle_power = initial(idle_power_usage) * (1 + parts_energy_rating)
-		new_active_power = initial(active_power_usage) * (1 + parts_energy_rating)
-
-		change_power_consumption(new_idle_power)
-		change_power_consumption(new_active_power, POWER_USE_ACTIVE)
-	*/
+	return
 
 /obj/structure/machinery/proc/assign_uid()
 	uid = gl_uid

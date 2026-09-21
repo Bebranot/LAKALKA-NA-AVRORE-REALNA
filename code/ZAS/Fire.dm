@@ -191,7 +191,10 @@ If it gains pressure too slowly, it may leak or just rupture instead of explodin
 				enemy_tile.adjacent_fire_act(loc, air_contents, air_contents.temperature, air_contents.volume)
 
 	set_light(l_color = fire_color(air_contents.temperature, TRUE))
-	var/list/animate_targets = get_above_oo() + src
+	// get_above_oo() already returns a fresh list we own; append in place instead of
+	// concatenating (which would allocate a second list every fire tile, every tick).
+	var/list/animate_targets = get_above_oo()
+	animate_targets += src
 	for (var/thing in animate_targets)
 		var/atom/movable/AM = thing
 		animate(AM, color = fire_color(air_contents.temperature), 5)

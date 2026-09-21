@@ -30,27 +30,32 @@
 
 //This is a central proc that all emotes are run through. This handles sending the messages to living mobs
 /mob/proc/send_emote(var/message, var/type)
-	var/list/messageturfs = list()//List of turfs we broadcast to.
 	var/list/messagemobs = list()
-	var/list/ghosts = list()
 	var/list/ghosts_nearby = list()
+	// Mobs we've already handled via the view scan below, so the ghostsight pass over
+	// GLOB.dead_mob_list (far smaller than GLOB.player_list, but still worth not re-adding) skips them.
+	var/list/seen = list()
 
-	for (var/turf in view(world.view, get_turf(src)))
-		messageturfs += turf
-
-	for(var/mob/M in GLOB.player_list)
-		if (!M.client || isnewplayer(M))
-			continue
-		if(get_turf(M) in messageturfs)
+	// Walking view()'s own turfs and reading their contents directly is equivalent to the old
+	// "collect turfs, then linear-scan every player checking turf membership" approach, but its
+	// cost scales with what's actually nearby instead of with total server population.
+	for (var/turf/T in view(world.view, get_turf(src)))
+		for (var/mob/M in T)
+			if (!M.client || isnewplayer(M))
+				continue
+			seen[M] = TRUE
 			if (isghost(M))
 				ghosts_nearby += M
-				continue
 			else if (isliving(M) && !(type == 2 && isdeaf(M)))
 				messagemobs += M
-		else if(src.client)
+
+	var/list/ghosts = list()
+	if(src.client)
+		for(var/mob/M in GLOB.dead_mob_list)
+			if (!M.client || isnewplayer(M) || seen[M])
+				continue
 			if (M.stat == DEAD && (M.client.prefs.toggles & CHAT_GHOSTSIGHT))
 				ghosts += M
-				continue
 
 	for (var/mob/N in messagemobs)
 		N.show_message(message, type)

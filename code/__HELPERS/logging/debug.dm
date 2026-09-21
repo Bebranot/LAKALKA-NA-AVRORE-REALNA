@@ -24,7 +24,12 @@
 /// Logging for config errors
 /// Rarely gets called; just here in case the config breaks.
 /proc/log_config(text)
-	WRITE_LOG(isnull(GLOB.config) ? "config_error.log" : GLOB.config.logfiles["config_error_log"], "CONFIG: [text]")
+	// Can run before GLOB.round_id/logfiles are ready (during initial config.txt parsing),
+	// which makes the native log writer throw. Never let a config warning crash boot.
+	try
+		WRITE_LOG(isnull(GLOB.config) ? "config_error.log" : GLOB.config.logfiles["config_error_log"], "CONFIG: [text]")
+	catch(var/exception/e)
+		world.log << "CONFIG: [text] (also failed to write to config_error.log: [e])"
 
 	// Do not print to world.log during unit tests
 	#if !defined(UNIT_TEST)

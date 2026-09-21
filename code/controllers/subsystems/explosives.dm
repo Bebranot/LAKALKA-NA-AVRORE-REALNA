@@ -41,7 +41,13 @@ SUBSYSTEM_DEF(explosives)
 		Master.ExplosionStart()
 		mc_notified = TRUE
 
-	for (var/A in work_queue)
+	// Mutating work_queue with -= while iterating it directly forces BYOND to rescan/shift the
+	// live list on every removal (O(n^2) for a batch of n), and left no room for a tick-budget
+	// check across a big batch. Snapshot it and drain a private copy instead; anything a chain
+	// reaction queues onto the now-empty work_queue mid-batch is correctly picked up next fire().
+	var/list/queue_batch = work_queue.Copy()
+	work_queue.Cut()
+	for (var/A in queue_batch)
 		var/datum/explosiondata/data = A
 
 		if (data.spreading)
@@ -49,7 +55,7 @@ SUBSYSTEM_DEF(explosives)
 		else
 			explosion(data)
 
-		work_queue -= data
+		CHECK_TICK
 
 // Handle a non-recusrive explosion.
 /datum/controller/subsystem/explosives/proc/explosion(var/datum/explosiondata/data)

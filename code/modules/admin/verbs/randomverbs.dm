@@ -821,63 +821,6 @@ Traitors and the like can also be revived with the previous role mostly intact.
 	message_admins("[key_name_admin(usr)] has annihilated [key_name_admin(M)]")
 	feedback_add_details("admin_verb","DUST") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
-/*
-/client/proc/cmd_manual_ban()
-	set name = "Manual Ban"
-	set category = "Special Verbs"
-	if(!authenticated || !holder)
-		to_chat(src, "Only administrators may use this command.")
-		return
-	var/mob/M = null
-	switch(alert("How would you like to ban someone today?", "Manual Ban", "Key List", "Enter Manually", "Cancel"))
-		if("Key List")
-			var/list/keys = list()
-			for(var/mob/M in world)
-				keys += M.client
-			var/selection = input("Please, select a player!", "Admin Jumping", null, null) as null|anything in keys
-			if(!selection)
-				return
-			M = selection:mob
-			if ((M.client && M.client.holder && (M.client.holder.level >= holder.level)))
-				alert("You cannot perform this action. You must be of a higher administrative rank!")
-				return
-
-	switch(alert("Temporary Ban?",,"Yes","No"))
-	if("Yes")
-		var/mins = input(usr,"How long (in minutes)?","Ban time",1440) as num
-		if(!mins)
-			return
-		if(mins >= 525600) mins = 525599
-		var/reason = input(usr,"Reason?","reason","Griefer") as text
-		if(!reason)
-			return
-		if(M)
-			AddBan(M.ckey, M.computer_id, reason, usr.ckey, 1, mins)
-			to_chat(M, "\red<BIG><B>You have been banned by [usr.client.ckey].\nReason: [reason].</B></BIG>")
-			to_chat(M, "\red This is a temporary ban, it will be removed in [mins] minutes.")
-			to_chat(M, "\red To try to resolve this matter head to http://ss13.donglabs.com/forum/")
-			log_admin("[usr.client.ckey] has banned [M.ckey].\nReason: [reason]\nThis will be removed in [mins] minutes.")
-			message_admins("\blue[usr.client.ckey] has banned [M.ckey].\nReason: [reason]\nThis will be removed in [mins] minutes.")
-			world.Export("http://216.38.134.132/adminlog.php?type=ban&key=[usr.client.key]&key2=[M.key]&msg=[html_decode(reason)]&time=[mins]&server=[replacetext(GLOB.config.server_name, "#", "")]")
-			del(M.client)
-			qdel(M)
-		else
-
-	if("No")
-		var/reason = input(usr,"Reason?","reason","Griefer") as text
-		if(!reason)
-			return
-		AddBan(M.ckey, M.computer_id, reason, usr.ckey, 0, 0)
-		to_chat(M, "\red<BIG><B>You have been banned by [usr.client.ckey].\nReason: [reason].</B></BIG>")
-		to_chat(M, "\red This is a permanent ban.")
-		to_chat(M, "\red To try to resolve this matter head to http://ss13.donglabs.com/forum/")
-		log_admin("[usr.client.ckey] has banned [M.ckey].\nReason: [reason]\nThis is a permanent ban.")
-		message_admins("\blue[usr.client.ckey] has banned [M.ckey].\nReason: [reason]\nThis is a permanent ban.")
-		world.Export("http://216.38.134.132/adminlog.php?type=ban&key=[usr.client.key]&key2=[M.key]&msg=[html_decode(reason)]&time=perma&server=[replacetext(GLOB.config.server_name, "#", "")]")
-		del(M.client)
-		qdel(M)
-*/
-
 /client/proc/update_world()
 	// If I see anyone granting powers to specific keys like the code that was here,
 	// I will both remove their SVN access and permanently ban them from my servers.
@@ -891,37 +834,6 @@ Traitors and the like can also be revived with the previous role mostly intact.
 	for(var/t in L)
 		to_chat(usr, "[t]")
 	feedback_add_details("admin_verb","CC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
-
-/* This proc is DEFERRED. Does not do anything.
-/client/proc/cmd_admin_remove_phoron()
-	set category = "Debug"
-	set name = "Stabilize Atmos."
-	if(!holder)
-		to_chat(src, "Only administrators may use this command.")
-		return
-	feedback_add_details("admin_verb","STATM") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
-// DEFERRED
-	spawn(0)
-		for(var/turf/T in view())
-			T.poison = 0
-			T.oldpoison = 0
-			T.tmppoison = 0
-			T.oxygen = 755985
-			T.oldoxy = 755985
-			T.tmpoxy = 755985
-			T.co2 = 14.8176
-			T.oldco2 = 14.8176
-			T.tmpco2 = 14.8176
-			T.n2 = 2.844e+006
-			T.on2 = 2.844e+006
-			T.tn2 = 2.844e+006
-			T.tsl_gas = 0
-			T.osl_gas = 0
-			T.sl_gas = 0
-			T.temp = 293.15
-			T.otemp = 293.15
-			T.ttemp = 293.15
-*/
 
 /client/proc/toggle_view_range()
 	set category = "Special Verbs"

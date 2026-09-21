@@ -1,6 +1,11 @@
 SUBSYSTEM_DEF(time_track)
 	name = "Time Tracking"
-	wait = 100
+	// This drives GLOB.glide_size_multiplier, which is what keeps client-side movement
+	// interpolation in sync with how fast the server is actually ticking. At the old 10-second
+	// wait, a real lag spike left movement looking desynced/stuttery for up to 10 seconds before
+	// this could correct it. The work done per fire is a handful of arithmetic ops - no loops -
+	// so firing 5x more often to react to lag within ~2 seconds instead is effectively free.
+	wait = 20
 	runlevels = RUNLEVEL_LOBBY | RUNLEVELS_DEFAULT
 
 	var/time_dilation_current = 0

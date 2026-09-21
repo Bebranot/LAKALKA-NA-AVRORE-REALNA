@@ -38,7 +38,9 @@
 		qdel(src)
 
 /obj/effect/fauna_spawner/Destroy()
-	UnregisterSignal(GLOB, COMSIG_GLOB_MOB_DEATH, PROC_REF(mob_died))
+	// This was registered on SSdcs (RegisterSignal(SSdcs, ...) above), not GLOB - unregistering
+	// from the wrong datum left a permanent dangling entry on SSdcs for every spawner ever qdel'd.
+	UnregisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, PROC_REF(mob_died))
 	for(var/mob/m in active_mobs)
 		UnregisterSignal(m, COMSIG_QDELETING)
 	active_mobs.Cut()

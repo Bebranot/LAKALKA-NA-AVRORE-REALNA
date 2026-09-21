@@ -93,6 +93,14 @@ GLOBAL_LIST_INIT_TYPED(all_cargo_receptacles, /obj/structure/cargo_receptacle, l
 
 /obj/structure/cargo_receptacle/Destroy()
 	GLOB.all_cargo_receptacles -= src
+	// If we were destroyed before our ghostrole ever spawned, the sector (recovered the same way
+	// LateInitialize() resolved it - my_sector there was only ever a local, never stored as a
+	// field) still holds the COMSIG_GHOSTROLE_TAKEN registration and would call spawn_packages()
+	// on a qdeleted src whenever it eventually fires.
+	if(late_spawner && delivery_sector)
+		var/obj/effect/overmap/visitable/my_sector = delivery_sector.resolve()
+		if(my_sector)
+			UnregisterSignal(my_sector, COMSIG_GHOSTROLE_TAKEN)
 	return ..()
 
 /obj/structure/cargo_receptacle/attackby(obj/item/attacking_item, mob/user)

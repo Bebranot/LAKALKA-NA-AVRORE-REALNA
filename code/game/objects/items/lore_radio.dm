@@ -22,6 +22,13 @@
 		toggle_receiving()
 	RegisterSignal(SSdcs, COMSIG_GLOB_LORE_RADIO_BROADCAST, PROC_REF(relay_lore_radio))
 
+/obj/item/lore_radio/Destroy()
+	// This type had no Destroy() override at all, so the SSdcs registration above (and the
+	// weather-broadcast one from toggle_receiving(), if it was ever turned on) outlived every
+	// radio that was ever qdel'd, permanently accumulating on SSdcs's global broadcast lists.
+	UnregisterSignal(SSdcs, list(COMSIG_GLOB_LORE_RADIO_BROADCAST, COMSIG_GLOB_Z_WEATHER_BROADCAST))
+	return ..()
+
 /obj/item/lore_radio/mechanics_hints(mob/user, distance, is_adjacent)
 	. = ..()
 	. += "Alt-click to turn it on and off."

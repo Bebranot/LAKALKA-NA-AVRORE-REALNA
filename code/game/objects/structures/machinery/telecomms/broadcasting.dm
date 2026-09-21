@@ -188,8 +188,9 @@
 		if(R.client && R.client.holder && !(R.client.prefs.toggles & CHAT_RADIO))
 			receive -= R
 
-	// Add observers who have ghost radio enabled
-	for (var/mob/abstract/ghost/observer/M in GLOB.player_list)
+	// Add observers who have ghost radio enabled. Ghosts are always stat == DEAD, so
+	// GLOB.dead_mob_list is a much smaller (and equally correct) set to scan than every player.
+	for (var/mob/abstract/ghost/observer/M in GLOB.dead_mob_list)
 		if(M.client && (M.client.prefs?.toggles & CHAT_GHOSTRADIO))
 			receive |= M
 

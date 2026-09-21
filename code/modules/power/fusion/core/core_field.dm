@@ -46,6 +46,8 @@
 	var/field_strength_power_multiplier = 1.0
 	/// Radius of the EM field. Scales with Field Strength.
 	var/size = 1
+	/// Timer id of the repeating update_light_colors() loop, so Destroy() can cancel it instead of leaking a permanent reference.
+	var/light_update_timer_id
 
 	/// Instability generated on this current tick.
 	var/tick_instability = 0
@@ -178,7 +180,7 @@
 
 /obj/effect/fusion_em_field/Initialize()
 	. = ..()
-	addtimer(CALLBACK(src, PROC_REF(update_light_colors)), 10 SECONDS, TIMER_LOOP)
+	light_update_timer_id = addtimer(CALLBACK(src, PROC_REF(update_light_colors)), 10 SECONDS, TIMER_STOPPABLE | TIMER_LOOP)
 	radio = new /obj/item/radio{channels=list("Engineering")}(src)
 
 /**
@@ -707,6 +709,9 @@
 	RadiateAll()
 	QDEL_LIST(particle_catchers)
 	QDEL_NULL(radio)
+	if(light_update_timer_id)
+		deltimer(light_update_timer_id)
+		light_update_timer_id = null
 	if(owned_core)
 		owned_core.owned_field = null
 		owned_core = null

@@ -366,8 +366,11 @@ var/list/channel_to_radio_key = new
 		listening = mergelists(listening, sensitive_listener, TRUE)
 
 	if(client)
-		for (var/mob/player_mob in GLOB.player_list)
-			if(!player_mob || player_mob.stat != DEAD || (player_mob in listening))
+		// GLOB.dead_mob_list already contains exactly the mobs with stat == DEAD, so scanning it
+		// instead of every connected player (the overwhelming majority of whom are alive) turns
+		// this per-spoken-line check from O(all players) into O(dead mobs).
+		for (var/mob/player_mob in GLOB.dead_mob_list)
+			if(!player_mob || (player_mob in listening))
 				continue
 			if(player_mob.client?.prefs.toggles & CHAT_GHOSTRADIO && length(used_radios)) //If they are talking into a radio and we hear all radio messages, don't duplicate for observers
 				continue

@@ -120,9 +120,10 @@
 				watching += M
 
 	// Ghost ears hear all speech. They hear it from any distance.
+	// Scan GLOB.dead_mob_list (already just the dead) instead of every connected player.
 	if(client)
-		for(var/mob/player_mob in GLOB.player_list)
-			if(!player_mob || player_mob.stat != DEAD || (player_mob in inner))
+		for(var/mob/player_mob in GLOB.dead_mob_list)
+			if(!player_mob || (player_mob in inner))
 				continue
 			if(player_mob.client?.prefs.toggles & CHAT_GHOSTEARS)
 				inner |= player_mob
