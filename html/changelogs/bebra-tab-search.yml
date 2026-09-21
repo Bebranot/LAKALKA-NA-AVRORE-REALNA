@@ -1,0 +1,4 @@
+author: bebra
+delete-after: True
+changes:
+  - rscadd: "Added a search box next to the ping indicator that filters the chat tab list by name or message type (works with both English and Russian terms, e.g. aghost/агост)."

@@ -14,6 +14,9 @@ export const chatPagesRecordAtom = atom({
 /** Chat has been initialized from storage */
 export const chatLoadedAtom = atom(false);
 
+/** Free-text query used to filter the tab list; empty string shows all tabs */
+export const tabSearchQueryAtom = atom('');
+
 export const allChatAtom = atom((get) => ({
   version: get(versionAtom),
   currentPageId: get(currentPageIdAtom),

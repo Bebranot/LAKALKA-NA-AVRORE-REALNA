@@ -4,9 +4,11 @@
  * @license MIT
  */
 
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { Box, Button, Stack, Tabs } from 'tgui-core/components';
 import { settingsVisibleAtom } from '../settings/atoms';
+import { tabSearchQueryAtom } from './atom';
+import { matchesTabSearch } from './searchSynonyms';
 import { useChatPages } from './use-chat-pages';
 
 type UnreadCountWidgetProps = {
@@ -24,12 +26,17 @@ export function ChatTabs(props) {
     useChatPages();
 
   const [, setSettingsVisible] = useAtom(settingsVisibleAtom);
+  const searchQuery = useAtomValue(tabSearchQueryAtom);
+
+  const visiblePages = searchQuery
+    ? pages.filter((page) => matchesTabSearch(pagesRecord[page], searchQuery))
+    : pages;
 
   return (
     <Stack align="center">
       <Stack.Item>
         <Tabs scrollable textAlign="center">
-          {pages.map((page) => {
+          {visiblePages.map((page) => {
             const actual = pagesRecord[page];
             return (
               <Tabs.Tab
