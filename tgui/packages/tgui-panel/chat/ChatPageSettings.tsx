@@ -33,7 +33,7 @@ export function ChatPageSettings(props) {
             <Button
               color="blue"
               icon="angles-left"
-              tooltip="Переместить вкладку влево"
+              tooltip="Reorder tab to the left"
               onClick={moveChatLeft}
             />
           </Stack.Item>
@@ -54,7 +54,7 @@ export function ChatPageSettings(props) {
             <Button
               color="blue"
               icon="angles-right"
-              tooltip="Переместить вкладку вправо"
+              tooltip="Reorder tab to the right"
               onClick={moveChatRight}
             />
           </Stack.Item>
@@ -63,26 +63,26 @@ export function ChatPageSettings(props) {
           <Button.Checkbox
             checked={page.hideUnreadCount}
             icon={page.hideUnreadCount ? 'bell-slash' : 'bell'}
-            tooltip="Отключить счётчик непрочитанных"
+            tooltip="Disables unread counter"
             onClick={() =>
               updateChatPage({
                 hideUnreadCount: !page.hideUnreadCount,
               })
             }
           >
-            Заглушить
+            Mute
           </Button.Checkbox>
         </Stack.Item>
         {!page.isMain && (
           <Stack.Item>
             <Button color="red" icon="times" onClick={removeChatPage}>
-              Удалить
+              Remove
             </Button>
           </Stack.Item>
         )}
       </Stack>
       <Divider />
-      <Section title="Отображаемые сообщения">
+      <Section title="Messages to display">
         {MESSAGE_TYPES.filter(
           (typeDef) => !typeDef.important && !typeDef.admin,
         ).map((typeDef) => (
@@ -94,7 +94,7 @@ export function ChatPageSettings(props) {
             {typeDef.name}
           </Button.Checkbox>
         ))}
-        <Collapsible mt={1} color="transparent" title="Админские">
+        <Collapsible mt={1} color="transparent" title="Admin stuff">
           {MESSAGE_TYPES.filter(
             (typeDef) => !typeDef.important && typeDef.admin,
           ).map((typeDef) => (

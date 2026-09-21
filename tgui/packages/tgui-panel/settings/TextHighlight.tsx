@@ -39,12 +39,13 @@ export function TextHighlightSettings(props) {
               icon="plus"
               onClick={() => addHighlight()}
             >
-              Добавить подсветку
+              Add Highlight Setting
             </Button>
             {highlightSettings.length >= WARN_AFTER_HIGHLIGHT_AMT && (
               <Box inline fontSize="0.9em" ml={1} color="red">
                 <Icon mr={1} name="triangle-exclamation" />
-                Много правил подсветки может снизить производительность!
+                Large amounts of highlights can potentially cause performance
+                issues!
               </Box>
             )}
           </Box>
@@ -53,10 +54,10 @@ export function TextHighlightSettings(props) {
       <Divider />
       <Box>
         <Button icon="check" onClick={() => chatRenderer.rebuildChat()}>
-          Применить
+          Apply now
         </Button>
         <Box inline fontSize="0.9em" ml={1} color="label">
-          Может ненадолго подвесить чат.
+          Can freeze the chat for a while.
         </Box>
       </Box>
     </Section>
@@ -126,14 +127,14 @@ function TextHighlightSetting(props) {
               })
             }
           >
-            Включено
+            Enabled
           </Button.Checkbox>
           <Button
             color="transparent"
             icon="times"
             onClick={() => removeHighlight(id)}
           >
-            Удалить
+            Delete
           </Button>
         </Stack.Item>
         {highlightWholeMessage && (
@@ -179,7 +180,7 @@ function TextHighlightSetting(props) {
         <Stack.Item>
           <Button.Checkbox
             checked={highlightWholeMessage}
-            tooltip="Подсвечивает всё сообщение целиком выбранным цветом"
+            tooltip="If this option is selected, the entire message will be highlighted in the color defined to the left."
             onClick={() =>
               updateHighlight({
                 id,
@@ -187,14 +188,14 @@ function TextHighlightSetting(props) {
               })
             }
           >
-            Всё сообщение
+            Whole Message
           </Button.Checkbox>
         </Stack.Item>
         <Stack.Item>
           <Button.Checkbox
             checked={matchWord}
             tooltipPosition="bottom-start"
-            tooltip="Только точные совпадения, без лишних букв вокруг. Не работает со знаками препинания, игнорируется при использовании regex"
+            tooltip="If this option is selected, only exact matches (no extra letters before or after) will trigger. Not compatible with punctuation. Overriden if regex is used."
             disabled={!!highlightRegex}
             onClick={() =>
               updateHighlight({
@@ -203,12 +204,12 @@ function TextHighlightSetting(props) {
               })
             }
           >
-            Точно
+            Exact
           </Button.Checkbox>
         </Stack.Item>
         <Stack.Item>
           <Button.Checkbox
-            tooltip="Учитывать регистр букв"
+            tooltip="If this option is selected, the highlight will be case-sensitive."
             checked={matchCase}
             onClick={() =>
               updateHighlight({
@@ -217,7 +218,7 @@ function TextHighlightSetting(props) {
               })
             }
           >
-            Регистр
+            Case
           </Button.Checkbox>
         </Stack.Item>
         <Stack.Item>
@@ -240,7 +241,7 @@ function TextHighlightSetting(props) {
         fluid
         height="3em"
         value={highlightText}
-        placeholder="Слова для подсветки через запятую (слово1, слово2, слово3)"
+        placeholder="Put words to highlight here. Separate terms with commas, i.e. (term1, term2, term3)"
         style={{ border: isRegexValid ? '' : '1px solid red' }}
         onBlur={(value) =>
           updateHighlight({

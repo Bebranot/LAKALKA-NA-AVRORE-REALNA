@@ -28,20 +28,20 @@ export const COLORS = {
 export const SETTINGS_TABS = [
   {
     id: 'general',
-    name: 'Общее',
+    name: 'General',
   },
 
   {
     id: 'textHighlight',
-    name: 'Подсветка текста',
+    name: 'Text Highlights',
   },
   {
     id: 'chatPage',
-    name: 'Вкладки чата',
+    name: 'Chat Tabs',
   },
   {
     id: 'statPanel',
-    name: 'Статус-панель',
+    name: 'Stat Panel',
   },
 ] as const;
 

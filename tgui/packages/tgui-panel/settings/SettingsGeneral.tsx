@@ -30,7 +30,7 @@ export function SettingsGeneral(props) {
   return (
     <Section>
       <LabeledList>
-        <LabeledList.Item label="Тема">
+        <LabeledList.Item label="Theme">
           {THEMES.map((THEME) => (
             <Button
               key={THEME}
@@ -46,7 +46,7 @@ export function SettingsGeneral(props) {
             </Button>
           ))}
         </LabeledList.Item>
-        <LabeledList.Item label="Размеры интерфейса">
+        <LabeledList.Item label="UI sizes">
           <Stack>
             <Stack.Item>
               <Button
@@ -59,17 +59,17 @@ export function SettingsGeneral(props) {
                 color={editingPanes ? 'red' : undefined}
                 icon={editingPanes ? 'save' : undefined}
               >
-                {editingPanes ? 'Сохранить' : 'Настроить размеры'}
+                {editingPanes ? 'Save' : 'Adjust UI Sizes'}
               </Button>
             </Stack.Item>
             <Stack.Item>
               <Button onClick={resetPaneSplitters} icon="refresh" color="red">
-                Сбросить
+                Reset
               </Button>
             </Stack.Item>
           </Stack>
         </LabeledList.Item>
-        <LabeledList.Item label="Шрифт">
+        <LabeledList.Item label="Font style">
           <Stack.Item>
             {!freeFont ? (
               <Collapsible
@@ -83,7 +83,7 @@ export function SettingsGeneral(props) {
                       setFreeFont(!freeFont);
                     }}
                   >
-                    Свой шрифт
+                    Custom font
                   </Button>
                 }
               >
@@ -122,13 +122,13 @@ export function SettingsGeneral(props) {
                     setFreeFont(!freeFont);
                   }}
                 >
-                  Свой шрифт
+                  Custom font
                 </Button>
               </Stack>
             )}
           </Stack.Item>
         </LabeledList.Item>
-        <LabeledList.Item label="Размер шрифта">
+        <LabeledList.Item label="Font size">
           <Stack>
             <Stack.Item grow>
               <Slider
@@ -145,7 +145,7 @@ export function SettingsGeneral(props) {
             </Stack.Item>
           </Stack>
         </LabeledList.Item>
-        <LabeledList.Item label="Межстрочный интервал">
+        <LabeledList.Item label="Line height">
           <Slider
             width="30%"
             step={0.01}
@@ -160,7 +160,7 @@ export function SettingsGeneral(props) {
             }
           />
         </LabeledList.Item>
-        <LabeledList.Item label="Сохранённые сообщения">
+        <LabeledList.Item label="Saved messages">
           <Slider
             width="30%"
             step={50}
@@ -182,38 +182,38 @@ export function SettingsGeneral(props) {
         <Stack.Item mt={0.15}>
           <Button
             icon="compact-disc"
-            tooltip="Экспорт настроек чата"
+            tooltip="Export chat settings"
             onClick={exportChatSettings}
           >
-            Экспорт настроек
+            Export settings
           </Button>
         </Stack.Item>
         <Stack.Item mt={0.15}>
           <Button.File
             accept=".json"
-            tooltip="Импорт настроек чата"
+            tooltip="Import chat settings"
             icon="arrow-up-from-bracket"
             onSelectFiles={importChatSettings}
           >
-            Импорт настроек
+            Import settings
           </Button.File>
         </Stack.Item>
         <Stack.Item grow mt={0.15}>
           <Button
             icon="save"
-            tooltip="Сохранить историю вкладки в HTML-файл"
+            tooltip="Export current tab history into HTML file"
             onClick={() => chatRenderer.saveToDisk()}
           >
-            Сохранить лог чата
+            Save chat log
           </Button>
         </Stack.Item>
         <Stack.Item mt={0.15}>
           <Button.Confirm
             icon="trash"
-            tooltip="Очистить историю вкладки"
+            tooltip="Erase current tab history"
             onClick={() => chatRenderer.clearChat()}
           >
-            Очистить чат
+            Clear chat
           </Button.Confirm>
         </Stack.Item>
       </Stack>
