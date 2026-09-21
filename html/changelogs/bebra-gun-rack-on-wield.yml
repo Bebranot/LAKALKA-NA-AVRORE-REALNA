@@ -1,0 +1,4 @@
+author: bebra
+delete-after: True
+changes:
+  - qol: "Pressing the wield key again on an already-wielded gun with a pump/bolt/unique action now racks that action (chambering a round) instead of un-wielding it. Guns without a unique action still toggle wield off as before."

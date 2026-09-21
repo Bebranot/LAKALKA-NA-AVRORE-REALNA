@@ -788,7 +788,14 @@ ABSTRACT_TYPE(/obj/item/gun)
 /obj/item/gun/attack_self(mob/user)
 	. = ..()
 	if(is_wieldable)
-		toggle_wield(usr)
+		// Once already wielded, guns with a rack/pump/bolt action use the second (and every
+		// subsequent) press to cycle that action instead of dropping back to one hand - matching
+		// how you'd actually rack a pump shotgun or bolt rifle rather than re-gripping it.
+		// Guns without one (has_unique_gun_action FALSE) keep the old toggle-off behavior.
+		if(wielded && has_unique_gun_action)
+			unique_action(user)
+		else
+			toggle_wield(usr)
 		update_held_icon()
 	else
 		to_chat(usr, SPAN_WARNING("You can't wield \the [src]!"))
