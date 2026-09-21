@@ -1,0 +1,4 @@
+author: bebra
+delete-after: True
+changes:
+  - bugfix: "Fixed black bars appearing when maximizing or resizing the game window — the viewport now automatically re-fits to match the window's aspect ratio, not just at login or when toggling fullscreen/menu."

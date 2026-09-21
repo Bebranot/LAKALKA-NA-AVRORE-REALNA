@@ -424,6 +424,7 @@
 #include "code\controllers\subsystems\vote.dm"
 #include "code\controllers\subsystems\weather.dm"
 #include "code\controllers\subsystems\zcopy.dm"
+#include "code\controllers\subsystems\_Duty\DutyAutoFitViewport.dm"
 #include "code\controllers\subsystems\evacuation\evacuation.dm"
 #include "code\controllers\subsystems\evacuation\evacuation_eta.dm"
 #include "code\controllers\subsystems\evacuation\evacuation_helpers.dm"
