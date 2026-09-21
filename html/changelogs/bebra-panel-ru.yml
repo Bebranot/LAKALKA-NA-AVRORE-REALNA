@@ -1,0 +1,4 @@
+author: bebra
+delete-after: True
+changes:
+  - rscadd: "Translated the chat/status panel (tgui-panel) into Russian: tab labels, message type names, settings, tooltips and buttons."
