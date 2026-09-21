@@ -11,7 +11,6 @@ import { visibleAtom } from './audio/atoms';
 import { NowPlayingWidget } from './audio/NowPlayingWidget';
 import { ChatPanel } from './chat/ChatPanel';
 import { ChatTabs } from './chat/ChatTabs';
-import { ChatTabSearch } from './chat/ChatTabSearch';
 import { useChatPersistence } from './chat/use-chat-persistence';
 import { gameAtom } from './game/atoms';
 import { useKeepAlive } from './game/use-keep-alive';
@@ -38,9 +37,6 @@ export function Panel(props) {
             <Stack mr={1} align="center">
               <Stack.Item grow>
                 <ChatTabs />
-              </Stack.Item>
-              <Stack.Item>
-                <ChatTabSearch />
               </Stack.Item>
               <Stack.Item>
                 <PingIndicator />
